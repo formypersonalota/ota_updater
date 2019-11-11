@@ -21,4 +21,6 @@
     <string name="arrow_list_build_version">ArrowOS <xliff:g id="version" example="12.1">%1$s</xliff:g></string>
 
     <string name="arrow_list_build_version_date">ArrowOS <xliff:g id="version" example="12.1">%1$s</xliff:g> - <xliff:g id="date" example="July 11, 2022">%2$s</xliff:g></string>
+
+    <string name="blocked_update_dialog_message_custom">This update cannot be installed using the updater app. Try installing update via recovery.</string>
 </resources>
