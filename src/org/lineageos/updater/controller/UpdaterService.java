@@ -490,7 +490,7 @@ public class UpdaterService extends Service {
     private void setNotificationTitle(UpdateInfo update) {
         String buildDate = StringGenerator.getDateLocalizedUTC(this,
                 DateFormat.MEDIUM, update.getTimestamp());
-        String buildInfo = getString(R.string.list_build_version_date,
+        String buildInfo = getString(R.string.arrow_list_build_version_date,
                 update.getVersion(), buildDate);
         mNotificationStyle.setBigContentTitle(buildInfo);
         mNotificationBuilder.setContentTitle(buildInfo);
