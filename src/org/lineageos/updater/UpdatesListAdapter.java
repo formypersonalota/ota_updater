@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2022 The LineageOS Project
+ * Copyright (C) 2017-2023 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,6 +185,9 @@ public class UpdatesListAdapter extends RecyclerView.Adapter<UpdatesListAdapter.
                     update.getFinalizing() ?
                             R.string.finalizing_package :
                             R.string.preparing_ota_first_boot);
+            String percentage = NumberFormat.getPercentInstance().format(
+                    update.getInstallProgress() / 100.f);
+            viewHolder.mPercentage.setText(percentage);
             viewHolder.mProgressBar.setIndeterminate(false);
             viewHolder.mProgressBar.setProgress(update.getInstallProgress());
         } else if (mUpdaterController.isVerifyingUpdate(downloadId)) {
@@ -273,7 +276,7 @@ public class UpdatesListAdapter extends RecyclerView.Adapter<UpdatesListAdapter.
         String buildDate = StringGenerator.getDateLocalizedUTC(mActivity,
                 DateFormat.LONG, update.getTimestamp());
         String buildVersion = mActivity.getString(R.string.arrow_list_build_version,
-                update.getVersion());
+                Utils.getDisplayVersion(update.getVersion()));
         viewHolder.mBuildDate.setText(buildDate);
         viewHolder.mBuildVersion.setText(buildVersion);
         viewHolder.mBuildVersion.setCompoundDrawables(null, null, null, null);
@@ -313,25 +316,25 @@ public class UpdatesListAdapter extends RecyclerView.Adapter<UpdatesListAdapter.
 
     private void startDownloadWithWarning(final String downloadId) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-        boolean warn = preferences.getBoolean(Constants.PREF_MOBILE_DATA_WARNING, true);
-        if (Utils.isOnWifiOrEthernet(mActivity) || !warn) {
+        boolean warn = preferences.getBoolean(Constants.PREF_METERED_NETWORK_WARNING, true);
+        if (!(Utils.isNetworkMetered(mActivity) && warn)) {
             mUpdaterController.startDownload(downloadId);
             return;
         }
 
         View checkboxView = LayoutInflater.from(mActivity).inflate(R.layout.checkbox_view, null);
         CheckBox checkbox = checkboxView.findViewById(R.id.checkbox);
-        checkbox.setText(R.string.checkbox_mobile_data_warning);
+        checkbox.setText(R.string.checkbox_metered_network_warning);
 
         new AlertDialog.Builder(mActivity)
-                .setTitle(R.string.update_on_mobile_data_title)
-                .setMessage(R.string.update_on_mobile_data_message)
+                .setTitle(R.string.update_over_metered_network_title)
+                .setMessage(R.string.update_over_metered_network_message)
                 .setView(checkboxView)
                 .setPositiveButton(R.string.action_download,
                         (dialog, which) -> {
                             if (checkbox.isChecked()) {
                                 preferences.edit()
-                                        .putBoolean(Constants.PREF_MOBILE_DATA_WARNING, false)
+                                        .putBoolean(Constants.PREF_METERED_NETWORK_WARNING, false)
                                         .apply();
                                 mActivity.supportInvalidateOptionsMenu();
                             }
